@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistem Merubah Voice menjadi Text</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      color: #333;
+      white-space: pre-wrap; /* Mempertahankan format teks, termasuk baris baru */
+      word-wrap: break-word; /* Memecah kata agar tidak keluar dari container */
+      max-height: 400px;
+      overflow-y: auto; /* Membuat scrollbar jika teks melebihi batas */
+    }
+    #container {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f4f4f4;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      min-height: 150px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Merubah suara menjadi Text</h1>
+  <button onclick="startRecording()">Mulai Merekam Suara</button>
+
+  <!-- Container untuk menampung hasil transkripsi suara -->
+  <div id="container">
+    <h3>Hasil Transkripsi:</h3>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const resultDiv = document.getElementById("result");
+    let fullTranscript = "";  // Untuk menyimpan seluruh transkripsi
+
+    // Fungsi untuk mulai merekam suara
+    function startRecording() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'id-ID';  // Bahasa Indonesia
+      recognition.interimResults = true; // Menampilkan teks sementara saat berbicara
+
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        let transcript = event.results[0][0].transcript;
+        fullTranscript += transcript + " ";  // Menambahkan transkripsi terbaru
+
+        // Menampilkan hasil transkripsi dalam container, pastikan tidak melebihi 2000 kata
+        let words = fullTranscript.split(' ');
+        if (words.length > 2000) {
+          words = words.slice(words.length - 2000);  // Mengambil hanya 2000 kata terakhir
+        }
+        resultDiv.textContent = words.join(' ');
+      };
+
+      recognition.onerror = (event) => {
+        resultDiv.textContent = "Terjadi kesalahan: " + event.error;
+      };
+    }
+
+    document.addEventListener('contextmenu', function(e) {
+      e.preventDefault();
+      alert('Klik kanan dinonaktifkan di halaman ini.');
+    });
+  </script>
+</body>
+</html>
